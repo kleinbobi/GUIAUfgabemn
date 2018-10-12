@@ -4,6 +4,7 @@ import java.util.ArrayList;
 public class Ratenrechner {
 
 
+
 	private double nachschuessig;
 	private double barwert;
 	private double jahreszinssatz;
