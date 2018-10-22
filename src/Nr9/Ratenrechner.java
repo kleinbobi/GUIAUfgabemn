@@ -1,11 +1,10 @@
 package Nr9;
 
-import java.util.ArrayList;
 public class Ratenrechner {
 
 
 
-	private double nachschuessig;
+	private boolean nachschuessig;
 	private double barwert;
 	private double jahreszinssatz;
 	private int laufzeitInJahren;
@@ -15,11 +14,31 @@ public class Ratenrechner {
 
 
 
+
+	public void setRate(String s) throws RatenRechnenException{
+		try{
+			double i = Double.parseDouble(s);
+
+			if(i>0){
+				rate = i;
+			}else {
+				throw new RatenRechnenException();
+			}
+		}catch (NumberFormatException e){
+			throw new RatenRechnenException();
+		}
+	}
+
+	public String getRate(){
+		return rate+"";
+	}
+
 	public void setJahreszinssatz(String s) throws RatenRechnenException{
 		try{
 			double i = Double.parseDouble(s);
+
 			if(i>0){
-				i = jahreszinssatz;
+				jahreszinssatz = i;
 			}else {
 				throw new RatenRechnenException();
 			}
@@ -35,17 +54,8 @@ public class Ratenrechner {
 		return (nachschuessig+"");
 	}
 	
-	public void setNachschuessig(String nachschuessig) throws RatenRechnenException{
-		try {
-			double i = Double.parseDouble(nachschuessig);
-			if(i <= 0) {
-				throw new RatenRechnenException();
-			}else {
-				this.nachschuessig = i;
-			}
-		}catch(NumberFormatException e){
-			throw new RatenRechnenException();
-		}
+	public void setNachschuessig(boolean a){
+		nachschuessig = a;
 	}
 	
 	public String getBarwert() throws RatenRechnenException{
@@ -99,37 +109,84 @@ public class Ratenrechner {
 		}
 	}
 	
-	public double berechneBarwert() {
-		return this.rate/(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr,this.ratenProJahr*this.laufzeitInJahren)*((this.jahreszinssatz/100)/this.ratenProJahr)/(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr, this.ratenProJahr*this.laufzeitInJahren)-1));
+	public void berechneBarwert() {
+		if (nachschuessig) {
+			barwert = this.rate / (Math.pow(1 + (this.jahreszinssatz / 100) / this.ratenProJahr, this.ratenProJahr * this.laufzeitInJahren) * ((this.jahreszinssatz / 100) / this.ratenProJahr) / (Math.pow(1 + (this.jahreszinssatz / 100) / this.ratenProJahr, this.ratenProJahr * this.laufzeitInJahren) - 1));
+		}else {
+			berechneBarwertv();
+		}
 	}
 	
-	public double berechneBarwertv() {
-		return this.rate*((this.laufzeitInJahren*this.ratenProJahr)+(this.jahreszinssatz/100/this.ratenProJahr)*((this.laufzeitInJahren*this.ratenProJahr)+1));
+	public void berechneBarwertv() {
+		barwert= this.rate*((this.laufzeitInJahren*this.ratenProJahr)+(this.jahreszinssatz/100/this.ratenProJahr)*((this.laufzeitInJahren*this.ratenProJahr)+1));
 	}
 	
-	public double berechneRate() {
-		return this.barwert*(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr,this.ratenProJahr*this.laufzeitInJahren)*((this.jahreszinssatz/100)/this.ratenProJahr)/(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr, this.ratenProJahr*this.laufzeitInJahren)-1));
+	public void berechneRate() {
+		if(nachschuessig){
+		rate = this.barwert*(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr,this.ratenProJahr*this.laufzeitInJahren)*((this.jahreszinssatz/100)/this.ratenProJahr)/(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr, this.ratenProJahr*this.laufzeitInJahren)-1));
+		}else {
+			berechneRatev();
+		}
+		rate = Math.floor(rate*100)/100.0;
 	}
 	
-	public double berechneRatev() {
-		return (this.barwert*((1+this.jahreszinssatz/100/this.ratenProJahr)-1))/(Math.pow(1+this.jahreszinssatz/100/this.ratenProJahr,1)*(Math.pow(1+this.jahreszinssatz/100/this.ratenProJahr, this.laufzeitInJahren*this.ratenProJahr)-1));
+	public void berechneRatev() {
+		rate = (this.barwert*((1+this.jahreszinssatz/100/this.ratenProJahr)-1))/(Math.pow(1+this.jahreszinssatz/100/this.ratenProJahr,1)*(Math.pow(1+this.jahreszinssatz/100/this.ratenProJahr, this.laufzeitInJahren*this.ratenProJahr)-1));
 	}
 	
-	public int berechneLaufzeit() {
-		return (int) -((Math.log(1-(((jahreszinssatz/100)*barwert)/(rate*ratenProJahr))))/(Math.log(1+(jahreszinssatz/100))));
+	public void berechneLaufzeit() {
+		if(nachschuessig){
+			laufzeitInJahren = (int) -((Math.log(1-(((jahreszinssatz/100)*barwert)/(rate*ratenProJahr))))/(Math.log(1+(jahreszinssatz/100))));
+		}else {
+			berechneLaufzeitv();
+		}
 	}
 	
-	public int berechneLaufzeitv() {
-		return (int) ((int) (Math.log((this.barwert*((1+this.jahreszinssatz/100/this.ratenProJahr)-1)/(this.rate*Math.pow((1+this.jahreszinssatz/100/this.ratenProJahr), 1)))+1))/(Math.log((1+this.jahreszinssatz/100/this.ratenProJahr))));
+	public void berechneLaufzeitv() {
+		laufzeitInJahren = (int) ((int) (Math.log((this.barwert*((1+this.jahreszinssatz/100/this.ratenProJahr)-1)/(this.rate*Math.pow((1+this.jahreszinssatz/100/this.ratenProJahr), 1)))+1))/(Math.log((1+this.jahreszinssatz/100/this.ratenProJahr))));
 	}
 
-	
-	public ArrayList<Integer> getPeriode() {
-		ArrayList <Integer> ret = new ArrayList();
-		for(int i = 1;i <= this.laufzeitInJahren*this.ratenProJahr;i++) {
-			ret.add(i);
+	public String getTilgungsplan() throws RatenRechnenException{
+		String ret = "";
+
+		ret = "<!DOCTYPE html> <html> <head> <title>This is document title</title> </head> <body>";
+
+		ret = ret + "<h1>Tilgungsplan</h1> <table  border=1 cellpadding=12> <tr> <td>Zahlungsart:</td>";
+
+		if (nachschuessig) {
+			ret = ret + "<td>Nachschüssig</td> </tr>";
+		} else {
+			ret = ret + "<td>Vorschüssig</td> </tr>";
 		}
+
+		ret += "<tr> <td>Barwert: </td> <td>" + getBarwert() + "</td>";
+
+		ret += "<tr> <td>Jahreszinssatz: </td> <td>" + jahreszinssatz + "%</td>";
+
+		ret += "<tr> <td>Laufzeit in Jahren: </td> <td>" + getLaufzeitInJahren() + "</td>";
+		if(ratenProJahr>1) {
+			ret += "<tr> <td>Rückzahlungsart: </td> <td>" + getRatenProJahr() + " Raten pro Jahr</td>";
+		}else {
+			ret += "<tr> <td>Rückzahlungsart: </td> <td>" + getRatenProJahr() + " Rate pro Jahr</td>";
+		}
+
+		ret += "<tr> <td>Rate: </td> <td>" + rate + "</td>";
+
+
+		ret+="</table>";
+		ret = ret + "" +
+					" <table  border=1 cellpadding=12> <tr> <th>Periode</th> <th>Rate</th> <th>Restkapital</th> <th>Zinsen</th> </tr>";
+		for (int i = 1; i < laufzeitInJahren*ratenProJahr; i++) {
+			ret = ret + " <tr> <td>" + i + "</td> <td>"+rate+"</td> <td>Bierdampf</td> <td>---------</td> </tr> ";
+		}
+
+		ret+="</table>";
+		ret = ret + "</body> </html>";
+
 		return ret;
 	}
+
+
+
 
 }
