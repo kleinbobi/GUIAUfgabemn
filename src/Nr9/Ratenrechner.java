@@ -1,5 +1,7 @@
 package Nr9;
 
+import javax.sound.midi.Soundbank;
+
 public class Ratenrechner {
 
 
@@ -38,7 +40,7 @@ public class Ratenrechner {
 			double i = Double.parseDouble(s);
 
 			if(i>0){
-				jahreszinssatz = i;
+				jahreszinssatz = (i*0.01);
 			}else {
 				throw new RatenRechnenException();
 			}
@@ -111,19 +113,19 @@ public class Ratenrechner {
 	
 	public void berechneBarwert() {
 		if (nachschuessig) {
-			barwert = this.rate / (Math.pow(1 + (this.jahreszinssatz / 100) / this.ratenProJahr, this.ratenProJahr * this.laufzeitInJahren) * ((this.jahreszinssatz / 100) / this.ratenProJahr) / (Math.pow(1 + (this.jahreszinssatz / 100) / this.ratenProJahr, this.ratenProJahr * this.laufzeitInJahren) - 1));
+			barwert = this.rate / (Math.pow(1 + (this.jahreszinssatz ) / this.ratenProJahr, this.ratenProJahr * this.laufzeitInJahren) * ((this.jahreszinssatz ) / this.ratenProJahr) / (Math.pow(1 + (this.jahreszinssatz ) / this.ratenProJahr, this.ratenProJahr * this.laufzeitInJahren) - 1));
 		}else {
 			berechneBarwertv();
 		}
 	}
 	
 	public void berechneBarwertv() {
-		barwert= this.rate*((this.laufzeitInJahren*this.ratenProJahr)+(this.jahreszinssatz/100/this.ratenProJahr)*((this.laufzeitInJahren*this.ratenProJahr)+1));
+		barwert= this.rate*((this.laufzeitInJahren*this.ratenProJahr)+(this.jahreszinssatz/this.ratenProJahr)*((this.laufzeitInJahren*this.ratenProJahr)+1));
 	}
 	
 	public void berechneRate() {
 		if(nachschuessig){
-		rate = this.barwert*(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr,this.ratenProJahr*this.laufzeitInJahren)*((this.jahreszinssatz/100)/this.ratenProJahr)/(Math.pow(1+(this.jahreszinssatz/100)/this.ratenProJahr, this.ratenProJahr*this.laufzeitInJahren)-1));
+		rate = this.barwert*(Math.pow(1+(this.jahreszinssatz)/this.ratenProJahr,this.ratenProJahr*this.laufzeitInJahren)*((this.jahreszinssatz)/this.ratenProJahr)/(Math.pow(1+(this.jahreszinssatz)/this.ratenProJahr, this.ratenProJahr*this.laufzeitInJahren)-1));
 		}else {
 			berechneRatev();
 		}
@@ -131,19 +133,19 @@ public class Ratenrechner {
 	}
 	
 	public void berechneRatev() {
-		rate = (this.barwert*((1+this.jahreszinssatz/100/this.ratenProJahr)-1))/(Math.pow(1+this.jahreszinssatz/100/this.ratenProJahr,1)*(Math.pow(1+this.jahreszinssatz/100/this.ratenProJahr, this.laufzeitInJahren*this.ratenProJahr)-1));
+		rate = (this.barwert*((1+this.jahreszinssatz/this.ratenProJahr)-1))/(Math.pow(1+this.jahreszinssatz/this.ratenProJahr,1)*(Math.pow(1+this.jahreszinssatz/this.ratenProJahr, this.laufzeitInJahren*this.ratenProJahr)-1));
 	}
 	
 	public void berechneLaufzeit() {
 		if(nachschuessig){
-			laufzeitInJahren = (int) -((Math.log(1-(((jahreszinssatz/100)*barwert)/(rate*ratenProJahr))))/(Math.log(1+(jahreszinssatz/100))));
+			laufzeitInJahren = (int) -((Math.log(1-(((jahreszinssatz)*barwert)/(rate*ratenProJahr))))/(Math.log(1+(jahreszinssatz))));
 		}else {
 			berechneLaufzeitv();
 		}
 	}
 	
 	public void berechneLaufzeitv() {
-		laufzeitInJahren = (int) ((int) (Math.log((this.barwert*((1+this.jahreszinssatz/100/this.ratenProJahr)-1)/(this.rate*Math.pow((1+this.jahreszinssatz/100/this.ratenProJahr), 1)))+1))/(Math.log((1+this.jahreszinssatz/100/this.ratenProJahr))));
+		laufzeitInJahren = (int) ((int) (Math.log((this.barwert*((1+this.jahreszinssatz/this.ratenProJahr)-1)/(this.rate*Math.pow((1+this.jahreszinssatz/this.ratenProJahr), 1)))+1))/(Math.log((1+this.jahreszinssatz/this.ratenProJahr))));
 	}
 
 	public String getTilgungsplan() throws RatenRechnenException{
@@ -151,7 +153,7 @@ public class Ratenrechner {
 
 		ret = "<!DOCTYPE html> <html> <head> <title>This is document title</title> </head> <body>";
 
-		ret = ret + "<h1>Tilgungsplan</h1> <table  border=1 cellpadding=12> <tr> <td>Zahlungsart:</td>";
+		ret +=  "<h1>Tilgungsplan</h1> <table  border=1 cellpadding=12> <tr> <td>Zahlungsart:</td>";
 
 		if (nachschuessig) {
 			ret = ret + "<td>Nachschüssig</td> </tr>";
@@ -161,7 +163,7 @@ public class Ratenrechner {
 
 		ret += "<tr> <td>Barwert: </td> <td>" + getBarwert() + "</td>";
 
-		ret += "<tr> <td>Jahreszinssatz: </td> <td>" + jahreszinssatz + "%</td>";
+		ret += "<tr> <td>Jahreszinssatz: </td> <td>" + jahreszinssatz *100+ "%</td>";
 
 		ret += "<tr> <td>Laufzeit in Jahren: </td> <td>" + getLaufzeitInJahren() + "</td>";
 		if(ratenProJahr>1) {
@@ -176,8 +178,21 @@ public class Ratenrechner {
 		ret+="</table>";
 		ret = ret + "" +
 					" <table  border=1 cellpadding=12> <tr> <th>Periode</th> <th>Rate</th> <th>Restkapital</th> <th>Zinsen</th> </tr>";
+		double zinzen, kapital;
+		kapital=barwert;
+
+
 		for (int i = 1; i < laufzeitInJahren*ratenProJahr; i++) {
-			ret = ret + " <tr> <td>" + i + "</td> <td>"+rate+"</td> <td>Bierdampf</td> <td>---------</td> </tr> ";
+			zinzen=this.runden( kapital*(jahreszinssatz/ratenProJahr));
+
+
+			kapital -= (rate-zinzen);
+			ret = ret + " <tr> <td>" + i + "</td> <td>"+rate+"</td> <td>"+kapital+"</td> <td>"+zinzen+"</td> </tr> ";
+
+
+
+
+
 		}
 
 		ret+="</table>";
@@ -186,6 +201,12 @@ public class Ratenrechner {
 		return ret;
 	}
 
+
+	private double runden(double i){
+		int a = (int)(i *100);
+
+		return a / 100.0;
+	}
 
 
 
